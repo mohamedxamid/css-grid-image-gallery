@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>CSS Grid Image Gallery!</title>
+</head>
+
+<body>
+
+  <div class="overlay">
+    <div class="overlay-inner">
+      <button class="close">× Close</button>
+      <img>
+    </div>
+  </div>
+
+  <section class="gallery">
+  </section>
+
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      padding: 50px;
+      font-family: sans-serif;
+      background: linear-gradient(to right, #F93D66, #6D47D9);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      margin: 0 0 5px 0;
+    }
+
+    p {
+      margin: 0 0 20px 0;
+    }
+
+    .close {
+      background: none;
+      color: black;
+      border: 0;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 100px);
+      grid-auto-rows: 100px;
+      grid-auto-flow: dense;
+    }
+
+    .item {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .item__overlay {
+      background: rgba(0, 0, 0, 0.3);
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: grid;
+      justify-content: center;
+      align-items: center;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .item:hover .item__overlay {
+      transform: translateY(0);
+    }
+
+    .item.v2 {
+      grid-row: span 2;
+    }
+
+    .item.v3 {
+      grid-row: span 3;
+    }
+
+    .item.v4 {
+      grid-row: span 4;
+    }
+
+    .item.h2 {
+      grid-column: span 2;
+    }
+
+    .item.h3 {
+      grid-column: span 3;
+    }
+
+    .item.h4 {
+      grid-column: span 4;
+    }
+
+
+
+    .overlay {
+      position: fixed;
+      background: rgba(0, 0, 0, 0.7);
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: none;
+      z-index: 2;
+    }
+
+    .overlay.open {
+      display: grid;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .overlay-inner {
+      background: white;
+      width: 700px;
+      padding: 20px;
+    }
+
+    .overlay img {
+      width: 100%;
+    }
+  </style>
+
+  <script>
+
+    const elGallery = document.querySelector('.gallery');
+    const elOverlay = document.querySelector(".overlay");
+    const elOverlayImg = elOverlay.querySelector('img');
+    const elOverlayClose = elOverlay.querySelector('.close');
+
+    function generateHTML([h, v]) {
+      return `
+      <div class="item h${h} v${v}">
+          <img src="images/${randomNumber(12)}.jpg" alt="random img">
+          <div class="item__overlay">
+            <button>View →</button>
+          </div>
+    </div>
+      `;
+    }
+
+    function randomNumber(limit) {
+      return Math.floor(Math.random() * limit) + 1;
+    }
+
+    function handleClick(evt) {
+      const src = evt.querySelector('img').src;
+      elOverlayImg.src = src;
+      elOverlay.classList.add("open");
+    }
+
+    function close() {
+      elOverlay.classList.remove("open");
+    }
+
+    const digits = Array.from({ length: 50 }, () => [randomNumber(4), randomNumber(4)]).concat([[1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1]]);
+
+    const html = digits.map(generateHTML).join('');
+    elGallery.innerHTML = html;
+
+    const elsItem = elGallery.querySelectorAll('.item');
+    
+    elsItem.forEach(function (elItem) {
+      elItem.addEventListener('click', function () {
+        handleClick(elItem);
+      })
+    })
+
+    if (elOverlayClose) {
+      elOverlayClose.addEventListener('click', function () {
+        close();
+      })
+    }
+
+  </script>
+</body>
+
+</html>
+
+
+<!-- 
+
+1. html generator funksiya yasaymiz, u func massiv qabul qiladi, massivda 2 qiymat bor "h" va "v"
+    u bizga html qaytaradi, .item.h.v>img+.item_overlay>btn
+    img mizni src sini ichida randomnumber function boladi
+2. random number function, limit qabul qiladi, qaytaradi
+3. handle click fnction, eventi boladi, event currenttarget'idan img selektorining src'sini tanlab oladi
+    uni overlay ni img src siga ga joylaydi va over classiga open classini qoshadi
+4. close function, overlay dan open classini olib tashaydi
+5. digits Array.from .concat
+6. html .map .join('')
+7. gallary ni ichiga html ni joylash
+8. item larni hammasini items const o'zgaruvchisiga jamlaymiz
+9. items larni barchasini iteratsiya qilib ularni barchasiga click hodisasi bolganda handleclick function nini bajarishini aytamiz
+10. overlayclose bosilganda close function ni bajarilsin
+
+CSS
+1. galleryimiz grid boladi va uni 100px ga 100px qilib bolib chiqamiz, auto-fill bilan
+    sigishmay qogan item lar tomonida tashab ketiladigan bosh joylarni boshqalari egallashi uchun grid-auto-flow: dense beramiz
+2. itemimiz ham grid boladi chtobi ichidagi rasm item egallagan shaklni toliq qoplab olishi uchun
+3. agar itemimiz v boyicha 2 dan 4 gacha biror sonni olgan bolsa item qator boyicha oshancha sonni egallasin
+4. agar itemimiz h boyicha 2 dan 4 gacha biror sonni olgan bolsa item ustun boyicha oshancha sonni egallasin
+5. 
+
+-->
